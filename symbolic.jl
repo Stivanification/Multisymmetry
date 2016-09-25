@@ -25,8 +25,8 @@ function check26(x)
 	x
 end
 
-# in unserem Fall: m ... Anzahl der Dimensionen, dh. 2
-#				   n ... Anzahl der Partikel
+# In our case: m ... physical dimensions, ie. 2
+#			   n ... amount of particles
 function create_variables(n,m)
 	mlog = convert(Int,floor(log(26,m))+1)
 	x = zeros(Int,mlog)
@@ -49,7 +49,7 @@ function create_variables(n,m)
 	varnames
 end
 
-# Symbolische Multiplikation von var[i]^potenz[i] über i
+# Symbolic multiplication of var[i]^potenz[i]
 function symbolic_prod(vars, potenz)
 	if length(vars) != length(potenz) println("Nicht richtige Anzahl an Potenzen & Variablen!"); return 0 end
 	myprod = Sym("prod")
@@ -60,7 +60,7 @@ function symbolic_prod(vars, potenz)
 	myprod
 end
 
-# Erzeugt alle Monome in m Variablen vom Grad maxdegree in einen Vektor
+# Creates all monomials in m variables of degree maxdegree
 function create_monomials(m,maxdegree)
 	create_symbols(m,"Y")
 	Vartmp = "[Y1"
@@ -80,7 +80,7 @@ function create_monomials(m,maxdegree)
 	M, Grad
 end
 
-# Erzeugt 1 Vektor mit 1 elementar Polynom angewandt auf 1 Vektor mit symbolischer Funktionen
+# Creates vector of elementary polynomial applied to a vector of symbolic functions
 function apply_elpol(n,m,M)
 	EP1 = Array{Any}(length(M))
 	varnames = create_variables(n,m)
@@ -124,13 +124,19 @@ function create_symmetricbasis(n,m, maxdegree)
 	ls = length(symbasis)
 	symbasisfinal = []
 	for i in 1:ls
-		if mod(i,100) == 0 println(i) end
 		if !(symbasis[i] in symbasisfinal)
 			push!(symbasisfinal,symbasis[i])
 		end
 	end
 
 	symbasisfinal, Grad
+end
+
+# creates vector of the 1. elementary polynomial applied to all monomials 
+function create_elpolmonomials(n,m,maxdegree)
+	M,Grad = create_monomials(m,maxdegree)
+	EP = apply_elpol(n,m,M)
+	EP, Grad
 end
 
 
