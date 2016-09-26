@@ -15,30 +15,34 @@ function LPcube(A,moments)
   weights = getvalue(x)
 end
 
+# checks if a formula for the parameters (n,m,maxdegree) has already been computed.
+# If not, computes and saves the formula.
 function return_cubature_formula(n,m,maxdegree)
-  A,moments,nodes = assemble_constraints(n,m,maxdegree)
-  tic()
-  weights = LPcube(A,moments)
-  t = toq()
-  println("Simplex solved in $t seconds.")
+  nodes,weights = try
+    println("formula already computed.")
+    nodes,weights = readdlm("formulas/($n,$m,$maxdegree)-nodes.txt"),readdlm("formulas/($n,$m,$maxdegree)-weights.txt")
+  catch
+    println("computing formula...")
+    A,moments,nodes = assemble_constraints(n,m,maxdegree)
+    tic()
+    weights = LPcube(A,moments)
+    t = toq()
+    println("Simplex solved in $t seconds.")
 
-  #restrict to nodes with nonzero weights
-  ind = find(weights)
-  weights = weights[ind]
-  nodes = nodes[ind,:]
+    #restrict to nodes with nonzero weights
+    ind = find(weights)
+    weights = weights[ind]
+    nodes = nodes[ind,:]
 
-  nodes,weights
+    writedlm("formulas/($n,$m,$maxdegree)-nodes.txt",nodes)
+    writedlm("formulas/($n,$m,$maxdegree)-weights.txt",weights)
+    nodes,weights
+   end
 end
 
+
 function test(n,m,maxdegree,f)
-  A,moments,nodes = assemble_constraints(n,m,maxdegree)
-  weights = LPcube(A,moments)
-
-  ind = find(weights)
-  weights = weights[ind]
-  nodes = nodes[ind,:]
-
-  s,d = create_symmetricbasis(n,m,maxdegree)
+  nodes,weights = return_cubature_formula(n,m,maxdegree)
   varnames = create_variables(n,m)
 	boundaries =""
 
@@ -59,15 +63,7 @@ function test(n,m,maxdegree,f)
 
 	lambstring = chop(lambstring)
 
-	fs = []
-	for p in s
-		push!(fs,eval(parse("lambdify($p, ["*lambstring*"])")))
-	end
-
 	println("integrate($f,"*boundaries*")")
-	println(typeof(a1))
-  #println(eval(parse("integrate(f"*tmp*","*boundaries*")")))
-  println(boundaries)
   exactf = float(eval(parse("integrate($f,"*boundaries*")")))
   ff = eval(parse("lambdify($f, ["*lambstring*"])"))
   quadf = [ff(nodes[k,:]...) for k in 1:size(nodes,1)]'weights
@@ -77,9 +73,7 @@ function test(n,m,maxdegree,f)
   println("interpolation: $quadf")
   println("error: $error")
   println("relative error: $relerror")
-
-  weights = weights[find(weights)]
-  weights
+  println("number of nodes: $(length(weights))")
 end
 
 function testthetest()
@@ -88,5 +82,5 @@ function testthetest()
 	f = (a1,b1,a2,b2) -> b1*b2*exp(a1+a2)
 	g = (x1,x2) -> exp(x1+x2)
   h = (x1,x2,x3,x4) -> exp(-(x1+x2+x3+x4))
-  test(2,2,7,f(a1,b1,a2,b2))
+  test(2,2,5,f(a1,b1,a2,b2))
 end
