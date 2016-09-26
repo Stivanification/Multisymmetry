@@ -80,6 +80,7 @@ function create_monomials(m,maxdegree)
 	M, Grad
 end
 
+
 # Creates vector of elementary polynomial applied to a vector of symbolic functions
 function apply_elpol(n,m,M)
 	EP1 = Array{Any}(length(M))
@@ -132,7 +133,7 @@ function create_symmetricbasis(n,m, maxdegree)
 	symbasisfinal, Grad
 end
 
-# creates vector of the 1. elementary polynomial applied to all monomials 
+# creates vector of the 1. elementary polynomial applied to all monomials
 function create_elpolmonomials(n,m,maxdegree)
 	M,Grad = create_monomials(m,maxdegree)
 	EP = apply_elpol(n,m,M)
