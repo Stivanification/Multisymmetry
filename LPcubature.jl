@@ -1,12 +1,13 @@
-include("symbolic.jl")
+include("assemble_constraint_matrix.jl")
 
 using SymPy
 using JuMP
-using Clp
-using PyPlot
+using Gurobi
+using Combinatorics
+using FastGaussQuadrature
 
 function LPcube(A,moments)
-  M = Model()
+  M = Model(solver=GurobiSolver())
   @variable(M, x[1:size(A,2)] >= 0)
   @constraint(M, A*x.== moments)
   @objective(M, Min, sum(0*x))
@@ -15,16 +16,13 @@ function LPcube(A,moments)
   weights = getvalue(x)
 end
 
-# checks if a formula for the parameters (n,m,maxdegree) has already been computed.
-# If not, computes and saves the formula.
 function return_cubature_formula(n,m,maxdegree)
   nodes,weights = try
-    println("formula already computed.")
     nodes,weights = readdlm("formulas/($n,$m,$maxdegree)-nodes.txt"),readdlm("formulas/($n,$m,$maxdegree)-weights.txt")
   catch
     println("computing formula...")
     A,moments,nodes = assemble_constraints(n,m,maxdegree)
-    tic()
+	  tic()
     weights = LPcube(A,moments)
     t = toq()
     println("Simplex solved in $t seconds.")
@@ -40,47 +38,31 @@ function return_cubature_formula(n,m,maxdegree)
    end
 end
 
+## tensor product gauss formula on [0,1]^N
+function gausstensor(N,maxdegree)
+    degree = convert(Int64,(maxdegree+1)/2)
+    nodes0,weights0 = gausslegendre(degree)
 
-function test(n,m,maxdegree,f)
-  nodes,weights = return_cubature_formula(n,m,maxdegree)
-  varnames = create_variables(n,m)
-	boundaries =""
+    #transform from [-1,1] to [0,1]
+    nodes0 = (nodes0 + ones(length(nodes0)))/2
+    weights0 = weights0/2
 
-	for j in 1:n
-      for k in 1:m
-          boundaries = boundaries*"("*varnames[k]*"$j"*",0,1),"
-      end
-  end
+    weights = kron(ntuple(n->weights0,N)...)
 
-  boundaries = chop(boundaries)
-  lambstring =""
+    tmp = []
+    for k in 1:N
+        push!(tmp,nodes0)
+    end
 
-	for j in 1:n
-      for k in 1:m
-          lambstring = lambstring*varnames[k]*"$j,"
-      end
-  end
+    tuplenodes = collect(product(tmp...))
 
-	lambstring = chop(lambstring)
+    nodes = zeros(degree^N,N)
 
-	println("integrate($f,"*boundaries*")")
-  exactf = float(eval(parse("integrate($f,"*boundaries*")")))
-  ff = eval(parse("lambdify($f, ["*lambstring*"])"))
-  quadf = [ff(nodes[k,:]...) for k in 1:size(nodes,1)]'weights
-  error = abs(exactf-quadf)
-  relerror = error/exactf
-  println("exact integral: $exactf")
-  println("interpolation: $quadf")
-  println("error: $error")
-  println("relative error: $relerror")
-  println("number of nodes: $(length(weights))")
-end
+    for k in 1:size(nodes,1)
+        for l in 1:size(nodes,2)
+            nodes[k,l] = tuplenodes[k][l]
+        end
+    end
 
-function testthetest()
-  a1,b1,a2,b2 = Sym("a1","b1","a2","b2")
-  a3,a4 = Sym("a3","a4")
-	f = (a1,b1,a2,b2) -> b1*b2*exp(a1+a2)
-	g = (x1,x2) -> exp(x1+x2)
-  h = (x1,x2,x3,x4) -> exp(-(x1+x2+x3+x4))
-  test(2,2,5,f(a1,b1,a2,b2))
+    nodes,weights
 end
