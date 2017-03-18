@@ -67,13 +67,13 @@ To compare the efficiency of our formulas to a common integration technique,
 we compared our results to results obtained by using a quasi-Monte Carlo method
 (the Sobol sequence).
 
-<img src="qmc.svg" alt="quasi-Monte Carlo error" style="width: 500px;"/>
+![qmc error](qmc.png)
 
 The first plots show the absolute error of the exact expectation to the
 approximation obtained by using a quasi-Monte Carlo method with N samples. The
 exact expectation is displayed in the last plot.
 
-<img src="sym.svg" alt="symmetric cubature error" style="width: 500px;"/>
+![symmetric cubature error](sym.png)
 
 The first plots above show the absolute error of the exact expectation o
 to the approximation obtained by using a multisymmetric cubature rule of degree
