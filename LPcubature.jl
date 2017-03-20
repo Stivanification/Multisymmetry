@@ -16,6 +16,8 @@ function LPcube(A,moments)
   weights = getvalue(x)
 end
 
+#Gudmund ist der Beste.
+
 function return_cubature_formula(n,m,maxdegree)
   nodes,weights = try
     nodes,weights = readdlm("formulas/($n,$m,$maxdegree)-nodes.txt"),readdlm("formulas/($n,$m,$maxdegree)-weights.txt")
