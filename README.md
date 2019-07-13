@@ -11,7 +11,7 @@ is (4,1)-multisymmetric while the function
 `g(x,y,z,w) = exp(10*x - y + 10*z - w)`
 is (2,2)-multisymmetric.
 
-This repository contains the julia code used in [this paper](https://https://homepage.univie.ac.at/stefan.rigger/Stefan%20Rigger_files/papers/Heitzinger2018Cubature.pdf)
+This repository contains the julia code used in [this paper](https://homepage.univie.ac.at/stefan.rigger/Stefan%20Rigger_files/papers/Heitzinger2018Cubature.pdf)
 to calculate cubature rules for multisymmetric functions as well as the formulas
 obtained using this code. The formulas can be found in
 the folder `formulas` and are labelled in the following
