@@ -3,7 +3,7 @@
 A multisymmetric function is a real-valued function satisfying the following
 definition.
 
-<img src="def1.png" alt="Definition Multisymmetrie, siehe arxiv Link" style ="width: 500px;"/>
+<img src="def1.png" alt="Definition Multisymmetry, cf link below " style ="width: 500px;"/>
 
 For example, the function
 `f(x,y,z,w) = x+y+z+w`
@@ -11,7 +11,7 @@ is (4,1)-multisymmetric while the function
 `g(x,y,z,w) = exp(10*x - y + 10*z - w)`
 is (2,2)-multisymmetric.
 
-This repository contains the julia code used in Paper (INSERT ARXIV LINK HERE)
+This repository contains the julia code used in [this paper](https://https://homepage.univie.ac.at/stefan.rigger/Stefan%20Rigger_files/papers/Heitzinger2018Cubature.pdf)
 to calculate cubature rules for multisymmetric functions as well as the formulas
 obtained using this code. The formulas can be found in
 the folder `formulas` and are labelled in the following
@@ -27,7 +27,7 @@ to the public. This code is published under a GNU general
 public license.
 
 # Requirements
-Thsi code is written in julia v0.5. The following packages
+This code is written in julia v0.5. The following packages
 are used:
 * Combinatorics
 * DriftDiffusionPoissonSystems
